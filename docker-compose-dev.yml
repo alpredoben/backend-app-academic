@@ -1,0 +1,38 @@
+version: '3'
+
+services:
+  pg-academic:
+    image: postgres:latest
+    container_name: pg-academic
+    environment:
+      - POSTGRES_DB=${DB_NAME}
+      - POSTGRES_USER=${DB_USER}
+      - POSTGRES_PASSWORD=${DB_PASS}
+    ports:
+      - '5761:5432'
+    networks:
+      - net-academic
+    volumes:
+      - vol-academic:/var/lib/postgresql/data
+
+  api-academic:
+    container_name: api-academic
+    build:
+      context: .
+      dockerfile: ./docker/Dockerfile.dev
+    depends_on:
+      - pg-academic
+    ports:
+      - '${APP_PORT}:${APP_PORT}'
+    restart: unless-stoped
+    volumes:
+      - ./:/app
+    networks:
+      - net-academic
+
+networks:
+  net-academic:
+    driver: bridge
+
+volumes:
+  vol-academic:

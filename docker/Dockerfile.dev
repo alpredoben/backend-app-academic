@@ -1,0 +1,22 @@
+FROM node:18.18.1-alpine
+
+RUN apk add --no-cache alpine-conf && \
+  setup-timezone -z Asia/Jakarta && \
+  rm -rf /var/cache/apk/*
+
+LABEL maintener="Ruben Alpredo Tampubolon"
+
+WORKDIR /app
+
+ENV APP_ENV=development
+ENV APP_TIMEZONE=Asia/Jakarta
+
+COPY package.json yarn.lock ./
+
+COPY . .
+
+RUN cp .env.example .env
+
+RUN yarn install && yarn global add nodemon && yarn cache clean --all
+
+CMD [ "yarn", "dev" ]
